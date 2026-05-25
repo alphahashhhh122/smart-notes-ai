@@ -57,7 +57,7 @@ const EditItem = ({ item }: EditItemProps) => {
     mutationFn: (data: ItemUpdateForm) =>
       ItemsService.updateItem({ id: item.id, requestBody: data }),
     onSuccess: () => {
-      showSuccessToast("Item updated successfully.")
+      showSuccessToast("Note updated successfully.")
       reset()
       setIsOpen(false)
     },
@@ -83,16 +83,16 @@ const EditItem = ({ item }: EditItemProps) => {
       <DialogTrigger asChild>
         <Button variant="ghost">
           <FaExchangeAlt fontSize="16px" />
-          Edit Item
+          Edit Note
         </Button>
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle>Edit Item</DialogTitle>
+            <DialogTitle>Edit Note</DialogTitle>
           </DialogHeader>
           <DialogBody>
-            <Text mb={4}>Update the item details below.</Text>
+            <Text mb={4}>Update the note details below.</Text>
             <VStack gap={4}>
               <Field
                 required
@@ -112,11 +112,11 @@ const EditItem = ({ item }: EditItemProps) => {
               <Field
                 invalid={!!errors.description}
                 errorText={errors.description?.message}
-                label="Description"
+                label="Content"
               >
                 <Input
                   {...register("description")}
-                  placeholder="Description"
+                  placeholder="Content"
                   type="text"
                 />
               </Field>
