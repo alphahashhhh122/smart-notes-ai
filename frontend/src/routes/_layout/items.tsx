@@ -72,9 +72,9 @@ function ItemsTable() {
             <FiSearch />
           </EmptyState.Indicator>
           <VStack textAlign="center">
-            <EmptyState.Title>You don't have any items yet</EmptyState.Title>
+            <EmptyState.Title>You don't have any notes yet</EmptyState.Title>
             <EmptyState.Description>
-              Add a new item to get started
+              Add a new note to get started
             </EmptyState.Description>
           </VStack>
         </EmptyState.Content>
@@ -89,7 +89,7 @@ function ItemsTable() {
           <Table.Row>
             <Table.ColumnHeader w="sm">ID</Table.ColumnHeader>
             <Table.ColumnHeader w="sm">Title</Table.ColumnHeader>
-            <Table.ColumnHeader w="sm">Description</Table.ColumnHeader>
+            <Table.ColumnHeader w="sm">Content</Table.ColumnHeader>
             <Table.ColumnHeader w="sm">Actions</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
@@ -137,7 +137,7 @@ function Items() {
   return (
     <Container maxW="full">
       <Heading size="lg" pt={12}>
-        Items Management
+        Notes
       </Heading>
       <AddItem />
       <ItemsTable />

@@ -33,11 +33,11 @@ const DeleteItem = ({ id }: { id: string }) => {
   const mutation = useMutation({
     mutationFn: deleteItem,
     onSuccess: () => {
-      showSuccessToast("The item was deleted successfully")
+      showSuccessToast("The note was deleted successfully")
       setIsOpen(false)
     },
     onError: () => {
-      showErrorToast("An error occurred while deleting the item")
+      showErrorToast("An error occurred while deleting the note")
     },
     onSettled: () => {
       queryClient.invalidateQueries()
@@ -59,7 +59,7 @@ const DeleteItem = ({ id }: { id: string }) => {
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" colorPalette="red">
           <FiTrash2 fontSize="16px" />
-          Delete Item
+          Delete Note
         </Button>
       </DialogTrigger>
 
@@ -67,11 +67,11 @@ const DeleteItem = ({ id }: { id: string }) => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogCloseTrigger />
           <DialogHeader>
-            <DialogTitle>Delete Item</DialogTitle>
+            <DialogTitle>Delete Note</DialogTitle>
           </DialogHeader>
           <DialogBody>
             <Text mb={4}>
-              This item will be permanently deleted. Are you sure? You will not
+              This note will be permanently deleted. Are you sure? You will not
               be able to undo this action.
             </Text>
           </DialogBody>
