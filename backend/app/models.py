@@ -44,6 +44,7 @@ class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    notes: list["Note"] = Relationship(back_populates="owner", cascade_delete=True)
 
 
 # Properties to return via API, id is always required
@@ -91,6 +92,56 @@ class ItemsPublic(SQLModel):
     data: list[ItemPublic]
     count: int
 
+# Shared properties
+class NoteBase(SQLModel):
+    title: str = Field(min_length=1, max_length=255)
+    content: str = Field(min_length=1)
+    tags: str | None = Field(default=None, max_length=500)
+
+
+# Properties to receive on note creation
+class NoteCreate(NoteBase):
+    pass
+
+
+# Properties to receive on note update
+class NoteUpdate(SQLModel):
+    title: str | None = Field(default=None, min_length=1, max_length=255)
+    content: str | None = Field(default=None, min_length=1)
+    tags: str | None = Field(default=None, max_length=500)
+
+
+# Database model, database table inferred from class name
+class Note(NoteBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    owner_id: uuid.UUID = Field(
+        foreign_key="user.id", nullable=False, ondelete="CASCADE"
+    )
+    owner: User | None = Relationship(back_populates="notes")
+
+
+# Properties to return via API
+class NotePublic(NoteBase):
+    id: uuid.UUID
+    owner_id: uuid.UUID
+
+
+class NotesPublic(SQLModel):
+    data: list[NotePublic]
+    count: int
+
+# Properties for AI Ask My Notes
+class AskNotesRequest(SQLModel):
+    question: str = Field(min_length=1, max_length=1000)
+
+class AskNotesSource(SQLModel):
+    id: uuid.UUID
+    title: str
+    snippet: str | None = None
+
+class AskNotesResponse(SQLModel):
+    answer: str
+    sources: list[AskNotesSource]
 
 # Generic message
 class Message(SQLModel):

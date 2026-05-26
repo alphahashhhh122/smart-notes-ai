@@ -49,6 +49,7 @@ class Settings(BaseSettings):
         ]
 
     PROJECT_NAME: str
+    OPENAI_API_KEY: str | None = None
     SENTRY_DSN: HttpUrl | None = None
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
