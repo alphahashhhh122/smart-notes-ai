@@ -1,4 +1,4 @@
-import {
+﻿import {
   Box,
   Button,
   Flex,
@@ -23,7 +23,7 @@ import {
 } from "react-icons/fi"
 import { LuNotebook } from "react-icons/lu"
 import { NotesService } from "../../client"
-import { useCustomToast } from "../../hooks/useCustomToast"
+import useCustomToast from "../../hooks/useCustomToast"
 
 export const Route = createFileRoute("/_layout/items")({
   component: NotesPage,
