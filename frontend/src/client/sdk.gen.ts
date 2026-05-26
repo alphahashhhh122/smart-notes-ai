@@ -3,7 +3,31 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+import type { AiAskNotesData, AiAskNotesResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, NotesReadNotesData, NotesReadNotesResponse, NotesCreateNoteData, NotesCreateNoteResponse, NotesReadNoteData, NotesReadNoteResponse, NotesUpdateNoteData, NotesUpdateNoteResponse, NotesDeleteNoteData, NotesDeleteNoteResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+
+export class AiService {
+    /**
+     * Ask Notes
+     * RAG-style query to Ask My Notes.
+     * Retrieves the user's notes, scores relevance based on keyword overlaps (with extra weights for titles and tags),
+     * sends context to OpenAI GPT-4o-mini, and returns the formulated answer and source citations.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns AskNotesResponse Successful Response
+     * @throws ApiError
+     */
+    public static askNotes(data: AiAskNotesData): CancelablePromise<AiAskNotesResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/ai/ask',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
 
 export class ItemsService {
     /**
@@ -205,6 +229,114 @@ export class LoginService {
             url: '/api/v1/password-recovery-html-content/{email}',
             path: {
                 email: data.email
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
+export class NotesService {
+    /**
+     * Read Notes
+     * @param data The data for the request.
+     * @param data.skip
+     * @param data.limit
+     * @param data.search
+     * @returns NotesPublic Successful Response
+     * @throws ApiError
+     */
+    public static readNotes(data: NotesReadNotesData = {}): CancelablePromise<NotesReadNotesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/notes/',
+            query: {
+                skip: data.skip,
+                limit: data.limit,
+                search: data.search
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Create Note
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns NotePublic Successful Response
+     * @throws ApiError
+     */
+    public static createNote(data: NotesCreateNoteData): CancelablePromise<NotesCreateNoteResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/notes/',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Read Note
+     * @param data The data for the request.
+     * @param data.id
+     * @returns NotePublic Successful Response
+     * @throws ApiError
+     */
+    public static readNote(data: NotesReadNoteData): CancelablePromise<NotesReadNoteResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/notes/{id}',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Note
+     * @param data The data for the request.
+     * @param data.id
+     * @param data.requestBody
+     * @returns NotePublic Successful Response
+     * @throws ApiError
+     */
+    public static updateNote(data: NotesUpdateNoteData): CancelablePromise<NotesUpdateNoteResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/v1/notes/{id}',
+            path: {
+                id: data.id
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Delete Note
+     * @param data The data for the request.
+     * @param data.id
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteNote(data: NotesDeleteNoteData): CancelablePromise<NotesDeleteNoteResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/notes/{id}',
+            path: {
+                id: data.id
             },
             errors: {
                 422: 'Validation Error'
