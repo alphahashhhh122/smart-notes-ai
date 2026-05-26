@@ -2,7 +2,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
-import { FiBrain, FiFileText, FiPlus, FiTrendingUp } from "react-icons/fi"
+import { FiCpu, FiFileText, FiPlus, FiTrendingUp } from "react-icons/fi"
 import { NotesService } from "../../client"
 import useAuth from "../../hooks/useAuth"
 
@@ -183,7 +183,7 @@ function Dashboard() {
           color="#34D399"
         />
         <StatCard
-          icon={FiBrain}
+          icon={FiCpu}
           label="AI Queries"
           value="âˆž"
           color="#FBBF24"
@@ -210,7 +210,7 @@ function Dashboard() {
           accent="#7C6AF7"
         />
         <QuickAction
-          icon={FiBrain}
+          icon={FiCpu}
           label="Ask AI"
           description="Query your notes with natural language questions"
           to="/ai"

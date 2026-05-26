@@ -1,4 +1,4 @@
-import {
+﻿import {
   Box,
   Button,
   Flex,
@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState, useRef, useEffect } from "react"
-import { FiBrain, FiSend, FiUser } from "react-icons/fi"
+import { FiCpu, FiSend, FiUser } from "react-icons/fi"
 import { AiService } from "../../client"
 
 export const Route = createFileRoute("/_layout/ai")({
@@ -91,7 +91,7 @@ function AiChatPage() {
             justifyContent="center"
             border="1px solid rgba(52,211,153,0.2)"
           >
-            <Box as={FiBrain} color="#34D399" fontSize="16px" />
+            <Box as={FiCpu} color="#34D399" fontSize="16px" />
           </Flex>
           <Heading
             fontFamily="'Syne', sans-serif"
@@ -134,7 +134,7 @@ function AiChatPage() {
                 justifyContent="center"
                 border="1px solid rgba(52,211,153,0.12)"
               >
-                <Box as={FiBrain} fontSize="28px" color="#34D399" />
+                <Box as={FiCpu} fontSize="28px" color="#34D399" />
               </Flex>
               <Box textAlign="center">
                 <Text
@@ -221,7 +221,7 @@ function AiChatPage() {
                   mt={0.5}
                 >
                   <Box
-                    as={msg.role === "user" ? FiUser : FiBrain}
+                    as={msg.role === "user" ? FiUser : FiCpu}
                     fontSize="13px"
                     color={msg.role === "user" ? "#7C6AF7" : "#34D399"}
                   />
@@ -308,7 +308,7 @@ function AiChatPage() {
                   bg="rgba(52,211,153,0.12)"
                   border="1px solid rgba(52,211,153,0.2)"
                 >
-                  <Box as={FiBrain} fontSize="13px" color="#34D399" />
+                  <Box as={FiCpu} fontSize="13px" color="#34D399" />
                 </Flex>
                 <Box
                   bg="#111218"

@@ -1,7 +1,7 @@
-import { Box, Flex, Text, VStack } from "@chakra-ui/react"
+﻿import { Box, Flex, Text, VStack } from "@chakra-ui/react"
 import { Link, useRouterState } from "@tanstack/react-router"
 import {
-  FiBrain,
+  FiCpu,
   FiHome,
   FiLogOut,
   FiSettings,
@@ -14,7 +14,7 @@ import useAuth from "../../hooks/useAuth"
 const navItems = [
   { icon: FiHome, label: "Dashboard", to: "/" },
   { icon: LuNotebook, label: "My Notes", to: "/items" },
-  { icon: FiBrain, label: "Ask AI", to: "/ai" },
+  { icon: FiCpu, label: "Ask AI", to: "/ai" },
 ]
 
 const bottomItems = [
