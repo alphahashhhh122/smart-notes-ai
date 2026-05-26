@@ -1,10 +1,10 @@
-import { Box, Flex, Grid, Heading, Text, VStack } from "@chakra-ui/react"
+﻿import { Box, Flex, Grid, Heading, Text, VStack } from "@chakra-ui/react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { FiBrain, FiFileText, FiPlus, FiTrendingUp } from "react-icons/fi"
-import { NotesService } from "../client"
-import useAuth from "../hooks/useAuth"
+import { NotesService } from "../../client"
+import useAuth from "../../hooks/useAuth"
 
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
@@ -146,7 +146,7 @@ function Dashboard() {
           color="#E8E8F0"
           letterSpacing="-0.5px"
         >
-          {name} 👋
+          {name} ðŸ‘‹
         </Heading>
         <Text color="#4A4A6A" fontSize="sm" mt={2}>
           {new Date().toLocaleDateString("en-US", {
@@ -185,7 +185,7 @@ function Dashboard() {
         <StatCard
           icon={FiBrain}
           label="AI Queries"
-          value="∞"
+          value="âˆž"
           color="#FBBF24"
         />
       </Grid>
