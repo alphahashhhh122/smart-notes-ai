@@ -1,10 +1,11 @@
-# Stage 0, "build-stage", based on Node.js, to build and compile the frontend
+﻿# Stage 0, "build-stage", based on Node.js, to build and compile the frontend
 FROM node:24 AS build-stage
 
 WORKDIR /app
 
 COPY package*.json /app/
 
+ARG CACHEBUST=1
 RUN npm install
 
 COPY ./ /app/
@@ -21,3 +22,4 @@ COPY --from=build-stage /app/dist/ /usr/share/nginx/html
 
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 COPY ./nginx-backend-not-found.conf /etc/nginx/extra-conf.d/backend-not-found.conf
+
