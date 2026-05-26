@@ -35,4 +35,4 @@ COPY ./app /app/app
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
 RUN uv sync
 
-CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+CMD ["sh", "-c", "fastapi run --workers 4 --port ${PORT:-8000} app/main.py"]
