@@ -1,136 +1,160 @@
 import uuid
+from datetime import datetime
 
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
+from sqlalchemy import Column, Text
+from typing import Optional
+
+try:
+    from pgvector.sqlalchemy import Vector
+    _embedding_col = Column(Vector(384), nullable=True)
+except ImportError:
+    _embedding_col = Column(Text, nullable=True)
 
 
-# Shared properties
+# ─── User Models ────────────────────────────────────────────────────────────
+
 class UserBase(SQLModel):
     email: EmailStr = Field(unique=True, index=True, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = Field(default=None, max_length=255)
 
-
-# Properties to receive via API on creation
 class UserCreate(UserBase):
     password: str = Field(min_length=8, max_length=40)
-
 
 class UserRegister(SQLModel):
     email: EmailStr = Field(max_length=255)
     password: str = Field(min_length=8, max_length=40)
     full_name: str | None = Field(default=None, max_length=255)
 
-
-# Properties to receive via API on update, all are optional
 class UserUpdate(UserBase):
     email: EmailStr | None = Field(default=None, max_length=255)  # type: ignore
     password: str | None = Field(default=None, min_length=8, max_length=40)
-
 
 class UserUpdateMe(SQLModel):
     full_name: str | None = Field(default=None, max_length=255)
     email: EmailStr | None = Field(default=None, max_length=255)
 
-
 class UpdatePassword(SQLModel):
     current_password: str = Field(min_length=8, max_length=40)
     new_password: str = Field(min_length=8, max_length=40)
 
-
-# Database model, database table inferred from class name
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
     notes: list["Note"] = Relationship(back_populates="owner", cascade_delete=True)
 
-
-# Properties to return via API, id is always required
 class UserPublic(UserBase):
     id: uuid.UUID
-
 
 class UsersPublic(SQLModel):
     data: list[UserPublic]
     count: int
 
 
-# Shared properties
+# ─── Item Models ─────────────────────────────────────────────────────────────
+
 class ItemBase(SQLModel):
     title: str = Field(min_length=1, max_length=255)
     description: str | None = Field(default=None, max_length=255)
 
-
-# Properties to receive on item creation
 class ItemCreate(ItemBase):
     pass
 
-
-# Properties to receive on item update
 class ItemUpdate(ItemBase):
     title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
 
-
-# Database model, database table inferred from class name
 class Item(ItemBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    owner_id: uuid.UUID = Field(
-        foreign_key="user.id", nullable=False, ondelete="CASCADE"
-    )
+    owner_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
     owner: User | None = Relationship(back_populates="items")
 
-
-# Properties to return via API, id is always required
 class ItemPublic(ItemBase):
     id: uuid.UUID
     owner_id: uuid.UUID
-
 
 class ItemsPublic(SQLModel):
     data: list[ItemPublic]
     count: int
 
-# Shared properties
+
+# ─── Note Models ─────────────────────────────────────────────────────────────
+
 class NoteBase(SQLModel):
     title: str = Field(min_length=1, max_length=255)
     content: str = Field(min_length=1)
     tags: str | None = Field(default=None, max_length=500)
 
-
-# Properties to receive on note creation
 class NoteCreate(NoteBase):
     pass
 
-
-# Properties to receive on note update
 class NoteUpdate(SQLModel):
     title: str | None = Field(default=None, min_length=1, max_length=255)
     content: str | None = Field(default=None, min_length=1)
     tags: str | None = Field(default=None, max_length=500)
 
-
-# Database model, database table inferred from class name
 class Note(NoteBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    owner_id: uuid.UUID = Field(
-        foreign_key="user.id", nullable=False, ondelete="CASCADE"
-    )
+    owner_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
     owner: User | None = Relationship(back_populates="notes")
+    summary: str | None = Field(default=None)
+    embedding: Optional[list] = Field(default=None, sa_column=_embedding_col)
 
-
-# Properties to return via API
 class NotePublic(NoteBase):
     id: uuid.UUID
     owner_id: uuid.UUID
-
+    summary: str | None = None
 
 class NotesPublic(SQLModel):
     data: list[NotePublic]
     count: int
 
-# Properties for AI Ask My Notes
+
+# ─── Note Version Models ──────────────────────────────────────────────────────
+
+class NoteVersion(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    note_id: uuid.UUID = Field(foreign_key="note.id", nullable=False)
+    title: str
+    content: str
+    tags: str | None = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class NoteVersionPublic(SQLModel):
+    id: uuid.UUID
+    note_id: uuid.UUID
+    title: str
+    content: str
+    tags: str | None
+    created_at: datetime
+
+class NoteVersionsPublic(SQLModel):
+    data: list[NoteVersionPublic]
+
+
+# ─── Shared Note Models ───────────────────────────────────────────────────────
+
+class SharedNote(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    note_id: uuid.UUID = Field(foreign_key="note.id", nullable=False)
+    token: str = Field(unique=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ShareResponse(SQLModel):
+    token: str
+
+class SharedNotePublic(SQLModel):
+    title: str
+    content: str
+    tags: str | None
+    summary: str | None
+
+
+# ─── AI Models ───────────────────────────────────────────────────────────────
+
 class AskNotesRequest(SQLModel):
     question: str = Field(min_length=1, max_length=1000)
 
@@ -142,22 +166,20 @@ class AskNotesSource(SQLModel):
 class AskNotesResponse(SQLModel):
     answer: str
     sources: list[AskNotesSource]
+    search_type: str = "keyword"  # "semantic" or "keyword"
 
-# Generic message
+
+# ─── Generic ─────────────────────────────────────────────────────────────────
+
 class Message(SQLModel):
     message: str
 
-
-# JSON payload containing access token
 class Token(SQLModel):
     access_token: str
     token_type: str = "bearer"
 
-
-# Contents of JWT token
 class TokenPayload(SQLModel):
     sub: str | None = None
-
 
 class NewPassword(SQLModel):
     token: str

@@ -1,4 +1,4 @@
-import secrets
+﻿import secrets
 import warnings
 from typing import Annotated, Any, Literal
 
@@ -50,6 +50,7 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str
     OPENAI_API_KEY: str | None = None
+    COHERE_API_KEY: str | None = None
     SENTRY_DSN: HttpUrl | None = None
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
