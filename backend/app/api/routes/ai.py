@@ -1,4 +1,4 @@
-import uuid
+﻿import uuid
 from typing import Any
 import httpx
 from fastapi import APIRouter, HTTPException
@@ -103,7 +103,7 @@ async def ask_notes(
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={settings.OPENAI_API_KEY}",
+                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={settings.OPENAI_API_KEY}",
                 headers={"Content-Type": "application/json"},
                 json={
                     "systemInstruction": {"parts": [{"text": system_prompt}]},
