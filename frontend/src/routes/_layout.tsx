@@ -1,5 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react"
-import { Outlet, createFileRoute, redirect } from "@tanstack/react-router"
+﻿import { Outlet, createFileRoute, redirect } from "@tanstack/react-router"
 import { Toaster } from "../components/ui/toaster"
 import { Sidebar } from "../components/Common/Sidebar"
 import useAuth, { isLoggedIn } from "../hooks/useAuth"
@@ -18,28 +17,26 @@ function Layout() {
 
   if (isLoading) {
     return (
-      <Flex minH="100vh" bg="#0A0B0F" alignItems="center" justifyContent="center">
-        <Box
-          w="32px"
-          h="32px"
-          border="2px solid rgba(124,106,247,0.2)"
-          borderTop="2px solid #7C6AF7"
-          borderRadius="full"
-          animation="spin 0.8s linear infinite"
-          style={{ animationName: "spin" }}
-        />
+      <div style={{ minHeight: "100vh", background: "#0A0B0F", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{
+          width: "32px", height: "32px",
+          border: "2px solid rgba(124,106,247,0.2)",
+          borderTop: "2px solid #7C6AF7",
+          borderRadius: "50%",
+          animation: "spin 0.8s linear infinite",
+        }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </Flex>
+      </div>
     )
   }
 
   return (
-    <Flex minH="100vh" bg="#0A0B0F">
+    <div style={{ minHeight: "100vh", background: "#0A0B0F", display: "flex" }}>
       <Sidebar />
-      <Box flex={1} overflow="auto" minH="100vh">
+      <div style={{ flex: 1, overflow: "auto", minHeight: "100vh" }}>
         <Outlet />
-      </Box>
+      </div>
       <Toaster />
-    </Flex>
+    </div>
   )
 }
