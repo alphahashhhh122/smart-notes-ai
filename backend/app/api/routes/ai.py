@@ -1,4 +1,4 @@
-from typing import Any
+﻿from typing import Any
 import httpx
 from fastapi import APIRouter
 from sqlmodel import select
@@ -92,7 +92,7 @@ async def ask_notes(
 
             if response.status_code != 200:
                 return AskNotesResponse(
-                    answer=f"AI error ({response.status_code}). Matched notes:\n\n" +
+                    answer=f"AI error ({response.status_code}): {response.text}. Matched notes:\n\n" +
                            "\n\n".join([f"**{n.title}**: {n.content}" for n in top_notes]),
                     sources=sources,
                 )
