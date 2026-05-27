@@ -1,4 +1,4 @@
-import {
+﻿import {
   Box,
   Button,
   Container,
@@ -62,7 +62,7 @@ function Login() {
         w="600px"
         h="600px"
         borderRadius="full"
-        bg="radial-gradient(circle, rgba(124,106,247,0.12) 0%, transparent 70%)"
+        style={{ background: "radial-gradient(circle, rgba(124,106,247,0.12) 0%, transparent 70%)" }}
         pointerEvents="none"
       />
       <Box
@@ -72,7 +72,7 @@ function Login() {
         w="400px"
         h="400px"
         borderRadius="full"
-        bg="radial-gradient(circle, rgba(124,106,247,0.08) 0%, transparent 70%)"
+        style={{ background: "radial-gradient(circle, rgba(124,106,247,0.08) 0%, transparent 70%)" }}
         pointerEvents="none"
       />
 
@@ -84,7 +84,7 @@ function Login() {
               <Flex
                 w="44px"
                 h="44px"
-                bg="rgba(124,106,247,0.15)"
+                style={{ background: "rgba(124,106,247,0.15)" }}
                 borderRadius="12px"
                 alignItems="center"
                 justifyContent="center"
@@ -180,7 +180,7 @@ function Login() {
                           message: "Password must be at least 8 characters",
                         },
                       })}
-                      placeholder="••••••••"
+                      placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                       bg="#1A1B26"
                       border="1px solid #22232E"
                       borderRadius="10px"
@@ -255,3 +255,6 @@ function Login() {
     </Box>
   )
 }
+
+
+

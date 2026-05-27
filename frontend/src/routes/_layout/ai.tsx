@@ -85,7 +85,7 @@ function AiChatPage() {
           <Flex
             w="36px"
             h="36px"
-            bg="rgba(52,211,153,0.12)"
+            style={{ background: "rgba(52,211,153,0.12)" }}
             borderRadius="10px"
             alignItems="center"
             justifyContent="center"
@@ -128,7 +128,7 @@ function AiChatPage() {
               <Flex
                 w="64px"
                 h="64px"
-                bg="rgba(52,211,153,0.08)"
+                style={{ background: "rgba(52,211,153,0.08)" }}
                 borderRadius="20px"
                 alignItems="center"
                 justifyContent="center"
@@ -305,7 +305,7 @@ function AiChatPage() {
                   alignItems="center"
                   justifyContent="center"
                   flexShrink={0}
-                  bg="rgba(52,211,153,0.12)"
+                  style={{ background: "rgba(52,211,153,0.12)" }}
                   border="1px solid rgba(52,211,153,0.2)"
                 >
                   <Box as={FiCpu} fontSize="13px" color="#34D399" />
@@ -398,3 +398,4 @@ function AiChatPage() {
     </Flex>
   )
 }
+
