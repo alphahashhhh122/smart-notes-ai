@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router"
+﻿import { createFileRoute } from "@tanstack/react-router"
 import { useState, useRef, useEffect } from "react"
 import { AiService } from "../../client"
 
@@ -100,7 +100,7 @@ function AiChatPage() {
                     : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44l-1.66-9.93A2.5 2.5 0 0 1 7.5 6.5h.5"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44l1.66-9.93A2.5 2.5 0 0 0 16.5 6.5H16"/></svg>}
                 </div>
                 <div>
-                  <div style={s.bubble(msg.role)}><p style={s.bubbleText}>{msg.content}</p></div>
+                  <div style={s.bubble(msg.role)}><p style={s.bubbleText}>{msg.content.replace(/\*\*(.*?)\*\*/g, "$1")}</p></div>
                   {msg.sources && msg.sources.length > 0 && (
                     <div>
                       <p style={s.sourcesLabel}>Sources</p>

@@ -64,7 +64,7 @@ async def ask_notes(
     system_prompt = (
         "You are a helpful assistant that answers questions using only the user's notes. "
         "Be friendly, clear and concise. Only use the provided notes to answer. "
-        "If the notes don't contain enough info, say so clearly."
+        "Answer directly and confidently based on the notes. Do not say you couldn't find something if the note exists and has content. Be concise."
     )
 
     user_content = f"Question: {request.question}\n\nNotes:\n===========\n{context_text}\n==========="
