@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
-import { NotesService } from "../../client"
+import { NotesService, AiService } from "../../client"
 import useCustomToast from "../../hooks/useCustomToast"
 
 export const Route = createFileRoute("/_layout/items")({
@@ -16,38 +16,56 @@ const s: Record<string, React.CSSProperties> = {
   h1: { fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "22px", color: "#E8E8F0", margin: "0 0 4px", letterSpacing: "-0.5px" },
   count: { fontSize: "12px", color: "#7878A0", margin: 0 },
   newBtn: { height: "38px", padding: "0 16px", background: "#7C6AF7", color: "white", border: "none", borderRadius: "9px", fontSize: "13px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" },
-  searchWrap: { position: "relative", maxWidth: "360px", marginBottom: "28px" },
-  searchIcon: { position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "#4A4A6A", pointerEvents: "none" as const },
+  searchWrap: { position: "relative" as const, maxWidth: "360px", marginBottom: "28px" },
+  searchIcon: { position: "absolute" as const, left: "10px", top: "50%", transform: "translateY(-50%)", color: "#4A4A6A", pointerEvents: "none" as const },
   searchInput: { width: "100%", height: "38px", background: "#111218", border: "1px solid #1A1B26", borderRadius: "9px", color: "#E8E8F0", fontSize: "13px", paddingLeft: "32px", paddingRight: "12px", outline: "none", boxSizing: "border-box" as const },
   grid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" },
-  card: { background: "#111218", border: "1px solid #1A1B26", borderRadius: "14px", padding: "18px", position: "relative" as const, cursor: "pointer" },
+  card: { background: "#111218", border: "1px solid #1A1B26", borderRadius: "14px", padding: "18px", position: "relative" as const },
   cardTitle: { fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "13px", color: "#E8E8F0", margin: "0 0 8px", paddingRight: "56px", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const },
   cardContent: { fontSize: "12px", color: "#7878A0", lineHeight: 1.6, margin: "0 0 14px", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const },
   cardFooter: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" as const, gap: "6px" },
   tagWrap: { display: "flex", gap: "4px", flexWrap: "wrap" as const },
   tag: { padding: "2px 8px", background: "rgba(124,106,247,0.12)", border: "1px solid rgba(124,106,247,0.2)", borderRadius: "5px", fontSize: "10px", color: "#9B8CF9", fontWeight: 500 },
-  actions: { position: "absolute" as const, top: "12px", right: "12px", display: "flex", gap: "4px", opacity: 0 },
+  actions: { position: "absolute" as const, top: "12px", right: "12px", display: "flex", gap: "4px" },
   actionBtn: { width: "26px", height: "26px", background: "#1A1B26", border: "none", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#7878A0" },
+  aiBadge: { display: "inline-flex", alignItems: "center", gap: "4px", padding: "3px 8px", background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)", borderRadius: "6px", fontSize: "10px", color: "#34D399", marginBottom: "8px" },
+  summaryBox: { background: "#0D0E14", border: "1px solid #1A1B26", borderRadius: "8px", padding: "10px 12px", marginTop: "10px", fontSize: "12px", color: "#B0B0C0", lineHeight: 1.6 },
   empty: { display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", padding: "80px 0", gap: "12px" },
   emptyIcon: { width: "56px", height: "56px", background: "rgba(124,106,247,0.08)", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(124,106,247,0.12)" },
   emptyTitle: { fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "15px", color: "#E8E8F0", margin: 0 },
   emptySub: { fontSize: "12px", color: "#7878A0", margin: 0 },
   overlay: { position: "fixed" as const, inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" },
-  modal: { background: "#111218", border: "1px solid #22232E", borderRadius: "18px", padding: "24px", width: "100%", maxWidth: "520px" },
+  modal: { background: "#111218", border: "1px solid #22232E", borderRadius: "18px", padding: "24px", width: "100%", maxWidth: "540px", maxHeight: "90vh", overflow: "auto" as const },
   modalHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" },
   modalTitle: { fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "15px", color: "#E8E8F0", margin: 0 },
   closeBtn: { background: "none", border: "none", color: "#7878A0", cursor: "pointer", fontSize: "18px" },
   fieldLabel: { display: "block", fontSize: "11px", color: "#7878A0", fontWeight: 500, marginBottom: "6px" },
   fieldInput: { width: "100%", height: "40px", background: "#1A1B26", border: "1px solid #22232E", borderRadius: "8px", color: "#E8E8F0", fontSize: "13px", padding: "0 12px", outline: "none", boxSizing: "border-box" as const, marginBottom: "14px" },
   fieldTextarea: { width: "100%", minHeight: "120px", background: "#1A1B26", border: "1px solid #22232E", borderRadius: "8px", color: "#E8E8F0", fontSize: "13px", padding: "10px 12px", outline: "none", boxSizing: "border-box" as const, resize: "vertical" as const, fontFamily: "'DM Sans', sans-serif", marginBottom: "14px" },
-  modalFooter: { display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "6px" },
-  cancelBtn: { height: "36px", padding: "0 16px", background: "transparent", border: "1px solid #22232E", borderRadius: "8px", color: "#7878A0", fontSize: "13px", cursor: "pointer" },
+  modalFooter: { display: "flex", gap: "10px", justifyContent: "space-between", alignItems: "center", marginTop: "6px" },
+  aiBtn: { height: "34px", padding: "0 14px", background: "rgba(52,211,153,0.1)", color: "#34D399", border: "1px solid rgba(52,211,153,0.2)", borderRadius: "8px", fontSize: "12px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" },
   saveBtn: { height: "36px", padding: "0 18px", background: "#7C6AF7", color: "white", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer" },
+  cancelBtn: { height: "36px", padding: "0 16px", background: "transparent", border: "1px solid #22232E", borderRadius: "8px", color: "#7878A0", fontSize: "13px", cursor: "pointer" },
+  aiHint: { fontSize: "11px", color: "#34D399", marginTop: "-10px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "4px" },
 }
 
 function NoteCard({ note, onEdit, onDelete }: { note: Note; onEdit: (n: Note) => void; onDelete: (id: string) => void }) {
   const [hovered, setHovered] = useState(false)
+  const [summary, setSummary] = useState<string | null>(null)
+  const [summarizing, setSummarizing] = useState(false)
   const tags = note.tags ? note.tags.split(",").map(t => t.trim()).filter(Boolean) : []
+
+  const summarize = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (summarizing) return
+    setSummarizing(true)
+    try {
+      const res = await AiService.askNotes({ requestBody: { question: `Summarize the note titled "${note.title}" in 2 sentences` } })
+      setSummary(res.answer)
+    } catch { setSummary("Could not generate summary.") }
+    finally { setSummarizing(false) }
+  }
+
   return (
     <div style={s.card} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       <div style={{ ...s.actions, opacity: hovered ? 1 : 0, transition: "opacity 0.15s" }}>
@@ -55,14 +73,31 @@ function NoteCard({ note, onEdit, onDelete }: { note: Note; onEdit: (n: Note) =>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
         <button style={{ ...s.actionBtn, color: "#F87171" }} onClick={e => { e.stopPropagation(); onDelete(note.id) }} title="Delete">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
         </button>
       </div>
       <p style={s.cardTitle}>{note.title}</p>
       <p style={s.cardContent}>{note.content}</p>
       <div style={s.cardFooter}>
         <div style={s.tagWrap}>{tags.slice(0,3).map(t => <span key={t} style={s.tag}>{t}</span>)}</div>
+        <button
+          style={{ ...s.actionBtn, width: "auto", padding: "0 8px", fontSize: "10px", color: summarizing ? "#34D399" : "#7878A0", gap: "4px", display: "flex", alignItems: "center" }}
+          onClick={summarize} title="AI Summary"
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44l-1.66-9.93A2.5 2.5 0 0 1 7.5 6.5h.5"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44l1.66-9.93A2.5 2.5 0 0 0 16.5 6.5H16"/></svg>
+          {summarizing ? "..." : "AI"}
+        </button>
       </div>
+      {summary && (
+        <div style={s.summaryBox}>
+          <div style={{ ...s.aiBadge, marginBottom: "6px" }}>
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44l-1.66-9.93A2.5 2.5 0 0 1 7.5 6.5h.5"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44l1.66-9.93A2.5 2.5 0 0 0 16.5 6.5H16"/></svg>
+            AI Summary
+          </div>
+          <p style={{ margin: 0 }}>{summary}</p>
+          <button style={{ background: "none", border: "none", color: "#4A4A6A", fontSize: "10px", cursor: "pointer", marginTop: "6px", padding: 0 }} onClick={e => { e.stopPropagation(); setSummary(null) }}>Dismiss</button>
+        </div>
+      )}
     </div>
   )
 }
@@ -74,6 +109,22 @@ function NoteModal({ note, onClose }: { note: Note | null; onClose: () => void }
   const [title, setTitle] = useState(note?.title || "")
   const [content, setContent] = useState(note?.content || "")
   const [tags, setTags] = useState(note?.tags || "")
+  const [suggestingTags, setSuggestingTags] = useState(false)
+  const [tagSuggested, setTagSuggested] = useState(false)
+
+  const suggestTags = async () => {
+    if (!title && !content) return
+    setSuggestingTags(true)
+    try {
+      const res = await AiService.askNotes({
+        requestBody: { question: `Suggest exactly 3 short comma-separated tags for a note titled "${title}" with content: ${content.slice(0, 200)}. Reply with only the tags, nothing else.` }
+      })
+      const suggested = res.answer.replace(/^tags?:/i, "").trim()
+      setTags(suggested)
+      setTagSuggested(true)
+    } catch { showErrorToast("Could not suggest tags") }
+    finally { setSuggestingTags(false) }
+  }
 
   const create = useMutation({
     mutationFn: () => NotesService.createNote({ requestBody: { title, content, tags } }),
@@ -96,17 +147,31 @@ function NoteModal({ note, onClose }: { note: Note | null; onClose: () => void }
           <h3 style={s.modalTitle}>{isEditing ? "Edit Note" : "New Note"}</h3>
           <button style={s.closeBtn} onClick={onClose}>×</button>
         </div>
+
         <label style={s.fieldLabel}>Title *</label>
         <input style={s.fieldInput} value={title} onChange={e => setTitle(e.target.value)} placeholder="Note title..." />
+
         <label style={s.fieldLabel}>Content</label>
         <textarea style={s.fieldTextarea} value={content} onChange={e => setContent(e.target.value)} placeholder="Write your note here..." />
+
         <label style={s.fieldLabel}>Tags (comma separated)</label>
-        <input style={s.fieldInput} value={tags} onChange={e => setTags(e.target.value)} placeholder="work, ideas, research..." />
+        <input style={s.fieldInput} value={tags} onChange={e => { setTags(e.target.value); setTagSuggested(false) }} placeholder="work, ideas, research..." />
+        {tagSuggested && <p style={s.aiHint}>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44l-1.66-9.93A2.5 2.5 0 0 1 7.5 6.5h.5"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44l1.66-9.93A2.5 2.5 0 0 0 16.5 6.5H16"/></svg>
+          Tags suggested by AI — edit freely
+        </p>}
+
         <div style={s.modalFooter}>
-          <button style={s.cancelBtn} onClick={onClose}>Cancel</button>
-          <button style={{ ...s.saveBtn, opacity: (!title.trim() || saving) ? 0.6 : 1 }} onClick={save} disabled={!title.trim() || saving}>
-            {saving ? "Saving..." : isEditing ? "Save Changes" : "Create Note"}
+          <button style={{ ...s.aiBtn, opacity: suggestingTags ? 0.6 : 1 }} onClick={suggestTags} disabled={suggestingTags || (!title && !content)}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44l-1.66-9.93A2.5 2.5 0 0 1 7.5 6.5h.5"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44l1.66-9.93A2.5 2.5 0 0 0 16.5 6.5H16"/></svg>
+            {suggestingTags ? "Suggesting..." : "AI Suggest Tags"}
           </button>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button style={s.cancelBtn} onClick={onClose}>Cancel</button>
+            <button style={{ ...s.saveBtn, opacity: (!title.trim() || saving) ? 0.6 : 1 }} onClick={save} disabled={!title.trim() || saving}>
+              {saving ? "Saving..." : isEditing ? "Save Changes" : "Create Note"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
