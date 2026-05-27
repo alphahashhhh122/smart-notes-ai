@@ -1,4 +1,4 @@
-import uuid
+﻿import uuid
 from typing import Any
 import httpx
 from fastapi import APIRouter, HTTPException
@@ -78,7 +78,7 @@ async def ask_notes(
     if not settings.OPENAI_API_KEY:
         # Graceful fallback: return deterministic text matching summary
         answer = (
-            "⚠️ **OpenAI API Key is not configured on the backend.**\n\n"
+            "âš ï¸ **OpenAI API Key is not configured on the backend.**\n\n"
             "To unlock full AI synthesis, set `OPENAI_API_KEY` in the environment variables.\n"
             "In the meantime, I scanned your notes and found these relevant matched documents:\n\n"
         )
@@ -150,3 +150,4 @@ async def ask_notes(
                    "\n\n".join([f"**{n.title}**: {n.content}" for n in top_notes]),
             sources=sources,
         )
+
