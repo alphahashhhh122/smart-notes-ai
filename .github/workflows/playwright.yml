@@ -31,7 +31,7 @@ jobs:
           changed:
             - backend/**
             - frontend/**
-            - .env
+            - .env.example
             - docker-compose*.yml
             - .github/workflows/playwright.yml
 
@@ -48,6 +48,8 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v5
+    - name: Create CI environment file
+      run: cp .env.example .env
     - uses: actions/setup-node@v5
       with:
         node-version: lts/*
