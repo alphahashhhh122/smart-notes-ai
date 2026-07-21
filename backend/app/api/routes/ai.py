@@ -2,12 +2,12 @@ from typing import Any
 
 import httpx
 from fastapi import APIRouter
-from sqlmodel import select
 from sqlalchemy import text as sql_text
+from sqlmodel import select
 
 from app.api.deps import CurrentUser, SessionDep
 from app.core.config import settings
-from app.models import Note, AskNotesRequest, AskNotesResponse, AskNotesSource
+from app.models import AskNotesRequest, AskNotesResponse, AskNotesSource, Note
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
@@ -83,7 +83,9 @@ async def ask_notes(
             )
             note_ids = [row[0] for row in result]
             if note_ids:
-                top_notes = [n for n in notes if str(n.id) in [str(nid) for nid in note_ids]]
+                top_notes = [
+                    n for n in notes if str(n.id) in [str(nid) for nid in note_ids]
+                ]
                 search_type = "semantic"
         except Exception:
             pass  # Fall through to keyword search
@@ -95,12 +97,19 @@ async def ask_notes(
         for note in notes:
             score = 0
             for word in q_words:
-                if word in note.title.lower(): score += 10
-                if word in (note.tags or "").lower(): score += 5
-                if word in note.content.lower(): score += 2
+                if word in note.title.lower():
+                    score += 10
+                if word in (note.tags or "").lower():
+                    score += 5
+                if word in note.content.lower():
+                    score += 2
             scored.append((score, note))
         scored.sort(key=lambda x: x[0], reverse=True)
-        top_notes = list(notes)[:5] if scored[0][0] == 0 else [n for s, n in scored[:5] if s > 0]
+        top_notes = (
+            list(notes)[:5]
+            if scored[0][0] == 0
+            else [n for s, n in scored[:5] if s > 0]
+        )
         search_type = "keyword"
 
     sources = [
@@ -113,21 +122,27 @@ async def ask_notes(
     ]
 
     # 4. Check API key
-    if not settings.OPENAI_API_KEY:
+    if not settings.GROQ_API_KEY:
         answer = "AI key not configured. Matched notes:\n\n" + "\n\n".join(
             [f"**{n.title}**: {n.content}" for n in top_notes]
         )
         return AskNotesResponse(answer=answer, sources=sources, search_type=search_type)
 
     # 5. Build context and call Groq
-    context_text = "\n\n---\n\n".join([
-        f"Title: {note.title}{f' [Tags: {note.tags}]' if note.tags else ''}\n"
-        f"Summary: {note.summary or 'N/A'}\n"
-        f"Content: {note.content}"
-        for note in top_notes
-    ])
+    context_text = "\n\n---\n\n".join(
+        [
+            f"Title: {note.title}{f' [Tags: {note.tags}]' if note.tags else ''}\n"
+            f"Summary: {note.summary or 'N/A'}\n"
+            f"Content: {note.content}"
+            for note in top_notes
+        ]
+    )
 
-    search_hint = "using semantic similarity search" if search_type == "semantic" else "using keyword search"
+    search_hint = (
+        "using semantic similarity search"
+        if search_type == "semantic"
+        else "using keyword search"
+    )
     system_prompt = (
         f"You are a helpful assistant answering questions about the user's notes ({search_hint}). "
         "Be friendly, clear and concise. Only use the provided notes. "
@@ -140,7 +155,7 @@ async def ask_notes(
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 "https://api.groq.com/openai/v1/chat/completions",
-                headers={"Authorization": f"Bearer {settings.OPENAI_API_KEY}"},
+                headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}"},
                 json={
                     "model": "llama-3.1-8b-instant",
                     "messages": [
@@ -155,19 +170,21 @@ async def ask_notes(
 
             if response.status_code != 200:
                 return AskNotesResponse(
-                    answer=f"AI error ({response.status_code}): {response.text}\n\nMatched notes:\n\n" +
-                           "\n\n".join([f"**{n.title}**: {n.content}" for n in top_notes]),
+                    answer=f"AI error ({response.status_code}): {response.text}\n\nMatched notes:\n\n"
+                    + "\n\n".join([f"**{n.title}**: {n.content}" for n in top_notes]),
                     sources=sources,
                     search_type=search_type,
                 )
 
             answer = response.json()["choices"][0]["message"]["content"].strip()
-            return AskNotesResponse(answer=answer, sources=sources, search_type=search_type)
+            return AskNotesResponse(
+                answer=answer, sources=sources, search_type=search_type
+            )
 
     except Exception as e:
         return AskNotesResponse(
-            answer=f"Connection error: {str(e)}\n\nMatched notes:\n\n" +
-                   "\n\n".join([f"**{n.title}**: {n.content}" for n in top_notes]),
+            answer=f"Connection error: {str(e)}\n\nMatched notes:\n\n"
+            + "\n\n".join([f"**{n.title}**: {n.content}" for n in top_notes]),
             sources=sources,
             search_type=search_type,
         )

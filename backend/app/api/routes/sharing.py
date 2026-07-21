@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 
 from app.api.deps import CurrentUser, SessionDep
-from app.models import Message, Note, ShareResponse, SharedNote, SharedNotePublic
+from app.models import Message, Note, SharedNote, SharedNotePublic, ShareResponse
 
 router = APIRouter(prefix="/sharing", tags=["sharing"])
 
@@ -61,9 +61,7 @@ def remove_share_link(
 @router.get("/view/{token}", response_model=SharedNotePublic)
 def view_shared_note(token: str, session: SessionDep) -> Any:
     """Public endpoint — view a shared note without authentication."""
-    shared = session.exec(
-        select(SharedNote).where(SharedNote.token == token)
-    ).first()
+    shared = session.exec(select(SharedNote).where(SharedNote.token == token)).first()
     if not shared:
         raise HTTPException(status_code=404, detail="Shared note not found")
 

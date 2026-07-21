@@ -1,29 +1,7 @@
-# Security Policy
+# Security policy
 
-Security is very important for this project and its community. 🔒
+This is a student project and is not maintained as a production service.
 
-Learn more about it below. 👇
+Do not report possible vulnerabilities in a public issue. Instead, contact the repository owner privately through their GitHub profile with a clear description and reproduction steps. Please do not include passwords, API keys, or other credentials in the report.
 
-## Versions
-
-The latest version or release is supported.
-
-You are encouraged to write tests for your application and update your versions frequently after ensuring that your tests are passing. This way you will benefit from the latest features, bug fixes, and **security fixes**.
-
-## Reporting a Vulnerability
-
-If you think you found a vulnerability, and even if you are not sure about it, please report it right away by sending an email to: security@tiangolo.com. Please try to be as explicit as possible, describing all the steps and example code to reproduce the security issue.
-
-I (the author, [@tiangolo](https://twitter.com/tiangolo)) will review it thoroughly and get back to you.
-
-## Public Discussions
-
-Please restrain from publicly discussing a potential security vulnerability. 🙊
-
-It's better to discuss privately and try to find a solution first, to limit the potential impact as much as possible.
-
----
-
-Thanks for your help!
-
-The community and I thank you for that. 🙇
+If you have committed a secret, rotate it with the provider immediately; removing a file from the latest commit does not invalidate a credential exposed in earlier commits.
