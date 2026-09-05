@@ -1,21 +1,30 @@
+import logging
 import uuid
 from typing import Any
 
 import httpx
 from fastapi import APIRouter, HTTPException
-from sqlmodel import func, or_, select
+from sqlmodel import col, func, or_, select
 
 from app.api.deps import CurrentUser, SessionDep
 from app.core.config import settings
 from app.models import (
-    Message, Note, NoteCreate, NotePublic, NotesPublic, NoteUpdate,
-    NoteVersion, NoteVersionPublic, NoteVersionsPublic,
+    Message,
+    Note,
+    NoteCreate,
+    NotePublic,
+    NotesPublic,
+    NoteUpdate,
+    NoteVersion,
+    NoteVersionsPublic,
 )
 
 router = APIRouter(prefix="/notes", tags=["notes"])
+logger = logging.getLogger(__name__)
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
+
 
 def get_embedding(text: str) -> list[float] | None:
     """Get embedding from Cohere API. Returns None on failure."""
@@ -37,39 +46,43 @@ def get_embedding(text: str) -> list[float] | None:
                 },
             )
             if response.status_code == 200:
-                return response.json()["embeddings"]["float"][0]
-    except Exception:
-        pass
+                values = response.json()["embeddings"]["float"][0]
+                return [float(value) for value in values]
+    except (httpx.HTTPError, KeyError, IndexError, TypeError) as exc:
+        logger.warning("Cohere embedding request failed: %s", exc)
     return None
 
 
 def get_summary(title: str, content: str) -> str | None:
     """Generate a 1-2 sentence summary using Groq. Returns None on failure."""
-    if not getattr(settings, "OPENAI_API_KEY", None):
+    if not settings.GROQ_API_KEY:
         return None
     try:
         with httpx.Client(timeout=10.0) as client:
             response = client.post(
                 "https://api.groq.com/openai/v1/chat/completions",
-                headers={"Authorization": f"Bearer {settings.OPENAI_API_KEY}"},
+                headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}"},
                 json={
                     "model": "llama-3.1-8b-instant",
-                    "messages": [{
-                        "role": "user",
-                        "content": f"Summarize this note in 1-2 sentences. Be concise.\n\nTitle: {title}\nContent: {content[:600]}"
-                    }],
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": f"Summarize this note in 1-2 sentences. Be concise.\n\nTitle: {title}\nContent: {content[:600]}",
+                        }
+                    ],
                     "max_tokens": 80,
                     "temperature": 0.3,
                 },
             )
             if response.status_code == 200:
-                return response.json()["choices"][0]["message"]["content"].strip()
-    except Exception:
-        pass
+                return str(response.json()["choices"][0]["message"]["content"]).strip()
+    except (httpx.HTTPError, KeyError, IndexError, TypeError) as exc:
+        logger.warning("Groq summary request failed: %s", exc)
     return None
 
 
 # ─── Routes ───────────────────────────────────────────────────────────────────
+
 
 @router.get("/", response_model=NotesPublic)
 def read_notes(
@@ -84,15 +97,17 @@ def read_notes(
         count_statement = select(func.count()).select_from(Note)
     else:
         base_statement = select(Note).where(Note.owner_id == current_user.id)
-        count_statement = select(func.count()).select_from(Note).where(
-            Note.owner_id == current_user.id
+        count_statement = (
+            select(func.count())
+            .select_from(Note)
+            .where(Note.owner_id == current_user.id)
         )
 
     if search:
         search_filter = or_(
-            Note.title.contains(search),
-            Note.content.contains(search),
-            Note.tags.contains(search),
+            col(Note.title).contains(search),
+            col(Note.content).contains(search),
+            col(Note.tags).contains(search),
         )
         base_statement = base_statement.where(search_filter)
         count_statement = count_statement.where(search_filter)
@@ -170,7 +185,9 @@ def update_note(
 
 
 @router.delete("/{id}")
-def delete_note(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Message:
+def delete_note(
+    session: SessionDep, current_user: CurrentUser, id: uuid.UUID
+) -> Message:
     note = session.get(Note, id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
@@ -182,6 +199,7 @@ def delete_note(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -
 
 
 # ─── Version History ──────────────────────────────────────────────────────────
+
 
 @router.get("/{id}/versions", response_model=NoteVersionsPublic)
 def get_note_versions(

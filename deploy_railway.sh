@@ -9,7 +9,8 @@ set -e
 #   2. Have a Railway project created (or know its ID).
 #   3. Export the following env vars before running this script:
 #        DATABASE_URL   – PostgreSQL connection string from Railway
-#        OPENAI_API_KEY – Your OpenAI secret key
+#        GROQ_API_KEY – Groq key for grounded answers and summaries
+#        COHERE_API_KEY – Cohere key for semantic retrieval (optional)
 #        FRONTEND_URL   – URL of the frontend service (will be set after deployment)
 # ------------------------------------------------------------
 
@@ -26,7 +27,7 @@ require_var() {
 }
 
 require_var DATABASE_URL
-require_var OPENAI_API_KEY
+require_var GROQ_API_KEY
 # FRONTEND_URL will be set after the frontend is deployed, so we don't require it now.
 
 # ----------------------------------------------------------------
@@ -46,7 +47,10 @@ echo "Deploying backend…"
 railway service create backend --dockerfile backend/Dockerfile || true
 # Set backend env vars (Railway will store them securely)
 railway variables set DATABASE_URL "$DATABASE_URL"
-railway variables set OPENAI_API_KEY "$OPENAI_API_KEY"
+railway variables set GROQ_API_KEY "$GROQ_API_KEY"
+if [ -n "${COHERE_API_KEY:-}" ]; then
+  railway variables set COHERE_API_KEY "$COHERE_API_KEY"
+fi
 # OPTIONAL: you can also set FRONTEND_URL here after the frontend is up.
 
 # Trigger a deployment of the backend service

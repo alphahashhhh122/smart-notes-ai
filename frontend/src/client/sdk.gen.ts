@@ -10,7 +10,7 @@ export class AiService {
      * Ask Notes
      * RAG-style query to Ask My Notes.
      * Retrieves the user's notes, scores relevance based on keyword overlaps (with extra weights for titles and tags),
-     * sends context to OpenAI GPT-4o-mini, and returns the formulated answer and source citations.
+     * sends context to the configured Groq model, and returns the grounded answer and source notes.
      * @param data The data for the request.
      * @param data.requestBody
      * @returns AskNotesResponse Successful Response
